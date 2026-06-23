@@ -24,10 +24,14 @@ def save_object(file_path, obj):
 
 def load_object(file_path):
     try:
+        if not os.path.exists(file_path):
+            logging.error("Artifact missing: %s (cwd=%s)", file_path, os.getcwd())
+            raise FileNotFoundError(f"Artifact not found: {file_path}")
+        logging.info("Loading artifact: %s", file_path)
         with open(file_path, "rb") as file_obj:
             return pickle.load(file_obj)
     except Exception as e:
-        logging.info("Exception Occured in load_object function utils")
+        logging.exception("Failed to load artifact at %s", file_path)
         raise customexception(e, sys)
 
 

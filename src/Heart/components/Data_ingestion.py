@@ -31,10 +31,23 @@ class DataIngestion:
     def initiate_data_ingestion(self):
         logging.info("Data ingestion started")
         try:
-            data_path = os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')), "Notebook_Experiments", "Data", "heart.csv")
-            data = pd.read_csv(data_path)
+            repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+            data_path = os.path.join(repo_root, "Notebook_Experiments", "Data", "heart.csv")
+            fallback_path = self.ingestion_config.raw_data_path
+
+            if os.path.exists(data_path):
+                data = pd.read_csv(data_path)
+                logging.info("Loaded dataset from %s", data_path)
+            elif os.path.exists(fallback_path):
+                data = pd.read_csv(fallback_path)
+                logging.info("heart.csv missing; loaded fallback dataset from %s", fallback_path)
+            else:
+                raise FileNotFoundError(
+                    f"Training data not found. Expected {data_path} or {fallback_path}. "
+                    "Commit heart.csv or run training locally before deploy."
+                )
+
             data = self._normalize_feature_encoding(data)
-            logging.info("Read the Data from the csv file")
 
             os.makedirs(os.path.dirname(self.ingestion_config.raw_data_path), exist_ok=True)
             data.to_csv(self.ingestion_config.raw_data_path, index=False)

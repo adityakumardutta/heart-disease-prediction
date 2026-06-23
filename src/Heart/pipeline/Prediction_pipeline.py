@@ -1,3 +1,4 @@
+import os
 import sys
 
 import pandas as pd
@@ -22,12 +23,19 @@ class PredictPipeline:
         self.model_name = "Unknown"
 
     def _load_artifacts(self):
+        preprocessor_path = artifact_path("Preprocessor.pkl")
+        model_path = artifact_path("Model.pkl")
+        logging.info("Loading artifacts from repo root: %s", os.path.dirname(preprocessor_path))
+
         if self.preprocessor is None:
-            self.preprocessor = load_object(artifact_path("Preprocessor.pkl"))
+            logging.info("Loading preprocessor: %s", preprocessor_path)
+            self.preprocessor = load_object(preprocessor_path)
         if self.model is None:
-            self.model = load_object(artifact_path("Model.pkl"))
+            logging.info("Loading model: %s", model_path)
+            self.model = load_object(model_path)
         metadata = load_json_artifact("model_metadata.json", default={})
         self.model_name = metadata.get("best_model", "Unknown")
+        logging.info("Artifacts loaded. Model: %s", self.model_name)
 
     def predict(self, features):
         result = self.predict_with_details(features)
