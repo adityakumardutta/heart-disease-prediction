@@ -3,6 +3,7 @@ import os
 import pickle
 import sys
 
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score
@@ -16,8 +17,12 @@ def save_object(file_path, obj):
     try:
         dir_path = os.path.dirname(file_path)
         os.makedirs(dir_path, exist_ok=True)
-        with open(file_path, "wb") as file_obj:
-            pickle.dump(obj, file_obj)
+        # Use joblib for sklearn objects for better compatibility
+        if hasattr(obj, '__sklearn_clone__') or 'sklearn' in str(type(obj)):
+            joblib.dump(obj, file_path)
+        else:
+            with open(file_path, "wb") as file_obj:
+                pickle.dump(obj, file_obj)
     except Exception as e:
         raise customexception(e, sys)
 
@@ -28,8 +33,12 @@ def load_object(file_path):
             logging.error("Artifact missing: %s (cwd=%s)", file_path, os.getcwd())
             raise FileNotFoundError(f"Artifact not found: {file_path}")
         logging.info("Loading artifact: %s", file_path)
-        with open(file_path, "rb") as file_obj:
-            return pickle.load(file_obj)
+        # Try joblib first for sklearn objects, fallback to pickle
+        try:
+            return joblib.load(file_path)
+        except:
+            with open(file_path, "rb") as file_obj:
+                return pickle.load(file_obj)
     except Exception as e:
         logging.exception("Failed to load artifact at %s", file_path)
         raise customexception(e, sys)
