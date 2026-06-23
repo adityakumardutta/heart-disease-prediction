@@ -1,0 +1,24 @@
+{
+  "best_model": "Support Vector Machine",
+  "accuracy": 0.8833,
+  "precision": 0.8696,
+  "recall": 0.8333,
+  "f1": 0.8511,
+  "roc_auc": 0.9502,
+  "confusion_matrix": [
+    [
+      33,
+      3
+    ],
+    [
+      4,
+      20
+    ]
+  ],
+  "charts": {
+    "confusion_matrix": "charts/confusion_matrix.png",
+    "roc_curve": "charts/roc_curve.png",
+    "feature_importance": "charts/feature_importance.png",
+    "model_comparison": "charts/model_comparison.png"
+  }
+}

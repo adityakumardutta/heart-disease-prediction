@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Model Dashboard{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="display-6 fw-bold text-primary">Model Performance Dashboard</h1>
+    <p class="text-muted">Evaluation metrics for the best model: <strong>{{ best_model }}</strong></p>
+</div>
+
+{% if not metrics %}
+<div class="alert alert-warning">No metrics found. Run <code>python train.py</code> to generate dashboard data.</div>
+{% else %}
+<div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="card metric-card shadow-sm"><div class="card-body"><small class="text-muted">Accuracy</small><h3>{{ (metrics.accuracy * 100)|round(1) }}%</h3></div></div></div>
+    <div class="col-md-3"><div class="card metric-card shadow-sm"><div class="card-body"><small class="text-muted">Precision</small><h3>{{ (metrics.precision * 100)|round(1) }}%</h3></div></div></div>
+    <div class="col-md-3"><div class="card metric-card shadow-sm"><div class="card-body"><small class="text-muted">Recall</small><h3>{{ (metrics.recall * 100)|round(1) }}%</h3></div></div></div>
+    <div class="col-md-3"><div class="card metric-card shadow-sm"><div class="card-body"><small class="text-muted">F1 Score</small><h3>{{ (metrics.f1 * 100)|round(1) }}%</h3></div></div></div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white"><h6 class="mb-0">ROC-AUC</h6></div>
+            <div class="card-body display-6 text-center text-primary">
+                {% if metrics.roc_auc %}{{ (metrics.roc_auc * 100)|round(1) }}%{% else %}N/A{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white"><h6 class="mb-0">Confusion Matrix</h6></div>
+            <div class="card-body text-center">
+                {% if metrics.charts and metrics.charts.confusion_matrix %}
+                <img src="{{ url_for('static', filename=metrics.charts.confusion_matrix) }}" class="img-fluid chart-img" alt="Confusion Matrix">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white"><h6 class="mb-0">ROC Curve</h6></div>
+            <div class="card-body text-center">
+                {% if metrics.charts and metrics.charts.roc_curve %}
+                <img src="{{ url_for('static', filename=metrics.charts.roc_curve) }}" class="img-fluid chart-img" alt="ROC Curve">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white"><h6 class="mb-0">Feature Importance</h6></div>
+            <div class="card-body text-center">
+                {% if metrics.charts and metrics.charts.feature_importance %}
+                <img src="{{ url_for('static', filename=metrics.charts.feature_importance) }}" class="img-fluid chart-img" alt="Feature Importance">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white"><h5 class="mb-0">Model Comparison</h5></div>
+    <div class="card-body">
+        {% if metrics.charts and metrics.charts.model_comparison %}
+        <img src="{{ url_for('static', filename=metrics.charts.model_comparison) }}" class="img-fluid chart-img mb-4" alt="Model Comparison">
+        {% endif %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Model</th>
+                        <th>Accuracy</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1</th>
+                        <th>ROC-AUC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for name, scores in comparison.items() %}
+                    <tr {% if name == best_model %}class="table-primary"{% endif %}>
+                        <td>{{ name }}{% if name == best_model %} <span class="badge text-bg-primary">Best</span>{% endif %}</td>
+                        <td>{{ (scores.accuracy * 100)|round(1) }}%</td>
+                        <td>{{ (scores.precision * 100)|round(1) }}%</td>
+                        <td>{{ (scores.recall * 100)|round(1) }}%</td>
+                        <td>{{ (scores.f1 * 100)|round(1) }}%</td>
+                        <td>{% if scores.roc_auc %}{{ (scores.roc_auc * 100)|round(1) }}%{% else %}N/A{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

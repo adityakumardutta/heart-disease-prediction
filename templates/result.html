@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Results | Heart Disease Risk{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body text-center p-4">
+                <div class="risk-circle bg-{{ result.risk_badge }}-subtle text-{{ result.risk_badge }} mx-auto mb-3">
+                    <span class="display-5 fw-bold">{{ result.risk_percent }}%</span>
+                </div>
+                <h2 class="h4">{{ result.outcome_text }}</h2>
+                <span class="badge rounded-pill text-bg-{{ result.risk_badge }} fs-6 mt-2">{{ result.risk_category }}</span>
+                <p class="text-muted mt-3 mb-0">Model: {{ result.model_name }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-lightbulb me-2 text-warning"></i>Personalized Recommendations</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for tip in result.recommendations %}
+                <li class="list-group-item"><i class="bi bi-check2-circle text-success me-2"></i>{{ tip }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-bar-chart me-2 text-info"></i>Top Risk Factors</h5>
+            </div>
+            <div class="card-body">
+                {% for item in result.feature_importance %}
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small">
+                        <span>{{ item.label }}</span>
+                        <span>{{ item.importance }}%</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-info" style="width: {{ item.importance }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="alert alert-secondary">
+            <i class="bi bi-exclamation-triangle me-2"></i>{{ result.disclaimer }}
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('download_report', record_id=result.record_id) }}" class="btn btn-outline-primary">
+                <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF Report
+            </a>
+            <a href="{{ url_for('home') }}" class="btn btn-primary">New Prediction</a>
+            <a href="{{ url_for('history') }}" class="btn btn-outline-secondary">View History</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

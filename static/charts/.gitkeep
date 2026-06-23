@@ -1,0 +1,2 @@
+# Keep chart output directory in version control
+!.gitkeep

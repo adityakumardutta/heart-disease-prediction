@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Predict | Heart Disease Risk{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="text-center mb-4">
+            <h1 class="display-6 fw-bold text-primary">Heart Disease Risk Assessment</h1>
+            <p class="lead text-muted">Enter patient vitals to receive an AI-powered cardiovascular risk analysis.</p>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-clipboard2-pulse me-2 text-primary"></i>Patient Information</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" id="predictionForm" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Age</label>
+                            <input type="number" name="age" class="form-control {% if errors.get('age') %}is-invalid{% endif %}"
+                                   value="{{ form_data.get('age', '') }}" min="18" max="100" required>
+                            {% if errors.get('age') %}<div class="invalid-feedback">{{ errors.age }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sex</label>
+                            <select name="sex" class="form-select" required>
+                                <option value="0" {% if form_data.get('sex')=='0' %}selected{% endif %}>Female</option>
+                                <option value="1" {% if form_data.get('sex','1')=='1' %}selected{% endif %}>Male</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Chest Pain Type</label>
+                            <select name="cp" class="form-select" required>
+                                <option value="0" {% if form_data.get('cp')=='0' %}selected{% endif %}>Typical Angina</option>
+                                <option value="1" {% if form_data.get('cp')=='1' %}selected{% endif %}>Atypical Angina</option>
+                                <option value="2" {% if form_data.get('cp')=='2' %}selected{% endif %}>Non-Anginal Pain</option>
+                                <option value="3" {% if form_data.get('cp')=='3' %}selected{% endif %}>Asymptomatic</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Resting Blood Pressure (mm Hg)</label>
+                            <input type="number" name="trestbps" class="form-control {% if errors.get('trestbps') %}is-invalid{% endif %}"
+                                   value="{{ form_data.get('trestbps', '') }}" min="80" max="220" required>
+                            {% if errors.get('trestbps') %}<div class="invalid-feedback">{{ errors.trestbps }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Serum Cholesterol (mg/dl)</label>
+                            <input type="number" name="chol" class="form-control {% if errors.get('chol') %}is-invalid{% endif %}"
+                                   value="{{ form_data.get('chol', '') }}" min="100" max="600" required>
+                            {% if errors.get('chol') %}<div class="invalid-feedback">{{ errors.chol }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fasting Blood Sugar &gt; 120 mg/dl</label>
+                            <select name="fbs" class="form-select" required>
+                                <option value="0" {% if form_data.get('fbs','0')=='0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data.get('fbs')=='1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Resting ECG Results</label>
+                            <select name="restecg" class="form-select" required>
+                                <option value="0" {% if form_data.get('restecg','0')=='0' %}selected{% endif %}>Normal</option>
+                                <option value="1" {% if form_data.get('restecg')=='1' %}selected{% endif %}>ST-T Abnormality</option>
+                                <option value="2" {% if form_data.get('restecg')=='2' %}selected{% endif %}>LV Hypertrophy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Max Heart Rate</label>
+                            <input type="number" name="thalach" class="form-control {% if errors.get('thalach') %}is-invalid{% endif %}"
+                                   value="{{ form_data.get('thalach', '') }}" min="60" max="220" required>
+                            {% if errors.get('thalach') %}<div class="invalid-feedback">{{ errors.thalach }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Exercise Induced Angina</label>
+                            <select name="exang" class="form-select" required>
+                                <option value="0" {% if form_data.get('exang','0')=='0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data.get('exang')=='1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">ST Depression (Oldpeak)</label>
+                            <input type="number" step="0.1" name="oldpeak" class="form-control {% if errors.get('oldpeak') %}is-invalid{% endif %}"
+                                   value="{{ form_data.get('oldpeak', '') }}" min="0" max="10" required>
+                            {% if errors.get('oldpeak') %}<div class="invalid-feedback">{{ errors.oldpeak }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ST Slope</label>
+                            <select name="slope" class="form-select" required>
+                                <option value="0" {% if form_data.get('slope')=='0' %}selected{% endif %}>Upsloping</option>
+                                <option value="1" {% if form_data.get('slope','1')=='1' %}selected{% endif %}>Flat</option>
+                                <option value="2" {% if form_data.get('slope')=='2' %}selected{% endif %}>Downsloping</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Major Vessels (Fluoroscopy)</label>
+                            <select name="ca" class="form-select" required>
+                                {% for i in range(4) %}
+                                <option value="{{ i }}" {% if form_data.get('ca','0')==i|string %}selected{% endif %}>{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Thalassemia</label>
+                            <select name="thal" class="form-select" required>
+                                <option value="3" {% if form_data.get('thal','3')=='3' %}selected{% endif %}>Normal</option>
+                                <option value="6" {% if form_data.get('thal')=='6' %}selected{% endif %}>Fixed Defect</option>
+                                <option value="7" {% if form_data.get('thal')=='7' %}selected{% endif %}>Reversible Defect</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-4" id="submitBtn">
+                            <span class="submit-text"><i class="bi bi-cpu me-2"></i>Analyze Risk</span>
+                            <span class="spinner-border spinner-border-sm d-none" role="status" id="loadingSpinner"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

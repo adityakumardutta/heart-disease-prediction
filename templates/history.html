@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="display-6 fw-bold text-primary">Prediction History</h1>
+        <p class="text-muted mb-0">Recent assessments stored in SQLite.</p>
+    </div>
+    <a href="{{ url_for('home') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>New Prediction</a>
+</div>
+
+{% if not records %}
+<div class="alert alert-info">No predictions yet. Submit the form on the home page to get started.</div>
+{% else %}
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Timestamp</th>
+                    <th>Age</th>
+                    <th>BP</th>
+                    <th>Chol</th>
+                    <th>Prediction</th>
+                    <th>Risk</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in records %}
+                <tr>
+                    <td>#{{ row.id }}</td>
+                    <td>{{ row.created_at }}</td>
+                    <td>{{ row.patient.age }}</td>
+                    <td>{{ row.patient.trestbps }}</td>
+                    <td>{{ row.patient.chol }}</td>
+                    <td>
+                        {% if row.prediction == 1 %}
+                        <span class="badge text-bg-danger">Disease</span>
+                        {% else %}
+                        <span class="badge text-bg-success">Healthy</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ row.risk_percent }}%</td>
+                    <td>{{ row.risk_category }}</td>
+                    <td>
+                        <a href="{{ url_for('download_report', record_id=row.id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-download"></i> PDF
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
