@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Heart Disease Prediction — Portfolio Edition
 
 AI-powered cardiovascular risk assessment web application built with Flask, scikit-learn, and a production-style ML pipeline. Designed as an internship-ready portfolio project demonstrating end-to-end machine learning engineering.
@@ -133,3 +134,7 @@ UCI Cleveland Heart Disease dataset (`Notebook_Experiments/Data/heart.csv`):
 ## License
 
 See [LICENSE](LICENSE).
+=======
+# heart-disease-prediction
+An end-to-end Heart Disease Prediction System built with Flask and Machine Learning. Features include risk assessment, personalized recommendations, prediction tracking, PDF reports, model performance dashboards, and an interactive user-friendly interface.
+>>>>>>> d13ddfca34e9341df1824a42399c70c2ca50daa7
